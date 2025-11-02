@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Registration Form</title>
+
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database.js"></script>
+
+<style>
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  margin: 0;
+}
+form {
+  text-align: left;
+}
+#notification {
+  position: fixed;
+  top: 10%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #e0ffe0;
+  border: 1px solid #00aa00;
+  padding: 20px;
+  display: none;
+}
+#notification button {
+  float: right;
+}
+</style>
+</head>
+<body>
+
+<div id="notification">
+  <span>Your Form Submitted Success!</span>
+  <button onclick="closeNotification()">OK</button>
+</div>
+
+<form id="regForm">
+  <h2 style="text-align:center;">Registration Form</h2>
+  <label>Name:</label><br>
+  <input type="text" id="name" required><br><br>
+
+  <label>Father's Name:</label><br>
+  <input type="text" id="father" required><br><br>
+
+  <label>Mother's Name:</label><br>
+  <input type="text" id="mother" required><br><br>
+
+  <label>Date of Birth:</label><br>
+  <input type="date" id="dob" required><br><br>
+
+  <label>Religion:</label><br>
+  <select id="religion" required>
+    <option value="">Select</option>
+    <option value="Islam">Islam</option>
+    <option value="Others">Others</option>
+  </select><br><br>
+
+  <button type="submit">Registration</button>
+</form>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
+  import { getDatabase, ref, push, set } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-database.js";
+
+  // 🔥 তোমার Firebase Config (সঠিকভাবে যুক্ত করা হয়েছে)
+  const firebaseConfig = {
+    apiKey: "AIzaSyC7UIa6duPhQ0_ZXxwWZBS60P_EP2bbLqs",
+    authDomain: "mrh-detaentry.firebaseapp.com",
+    databaseURL: "https://mrh-detaentry-default-rtdb.firebaseio.com",
+    projectId: "mrh-detaentry",
+    storageBucket: "mrh-detaentry.firebasestorage.app",
+    messagingSenderId: "1046673955321",
+    appId: "1:1046673955321:web:6e963d1548b685698e8528"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase(app);
+
+  const form = document.getElementById("regForm");
+  const notification = document.getElementById("notification");
+
+  form.addEventListener("submit", (e) => {
+    e.preventDefault();
+
+    const name = document.getElementById("name").value.trim();
+    const father = document.getElementById("father").value.trim();
+    const mother = document.getElementById("mother").value.trim();
+    const dob = document.getElementById("dob").value;
+    const religion = document.getElementById("religion").value;
+
+    if (!name || !father || !mother || !dob || !religion) {
+      alert("Please fill out all fields!");
+      return;
+    }
+
+    const newRef = push(ref(db, "registrations"));
+    set(newRef, {
+      name,
+      father,
+      mother,
+      dob,
+      religion,
+      submittedAt: new Date().toLocaleString()
+    })
+    .then(() => {
+      form.reset();
+      notification.style.display = "block";
+    })
+    .catch((error) => {
+      alert("Error: " + error.message);
+    });
+  });
+
+  window.closeNotification = function() {
+    notification.style.display = "none";
+  };
+</script>
+
+</body>
+</html>
