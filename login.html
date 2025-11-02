@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Login Form</title>
+
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database.js"></script>
+
+<style>
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  margin: 0;
+}
+form {
+  text-align: left;
+}
+#profile {
+  display: none;
+}
+</style>
+</head>
+<body>
+
+<div id="loginDiv">
+  <form id="loginForm">
+    <h2 style="text-align:center;">Login</h2>
+    <label>Name:</label><br>
+    <input type="text" id="loginName" required><br><br>
+
+    <label>Date of Birth:</label><br>
+    <input type="date" id="loginDob" required><br><br>
+
+    <button type="submit">Login</button>
+  </form>
+</div>
+
+<div id="profile">
+  <h2>Profile Page</h2>
+  <p><strong>Name:</strong> <span id="pName"></span></p>
+  <p><strong>Father's Name:</strong> <span id="pFather"></span></p>
+  <p><strong>Mother's Name:</strong> <span id="pMother"></span></p>
+  <p><strong>Date of Birth:</strong> <span id="pDob"></span></p>
+  <p><strong>Religion:</strong> <span id="pReligion"></span></p>
+  <button onclick="logout()">Logout</button>
+</div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
+  import { getDatabase, ref, get, child } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-database.js";
+
+  // 🔥 তোমার Firebase Config
+  const firebaseConfig = {
+    apiKey: "AIzaSyC7UIa6duPhQ0_ZXxwWZBS60P_EP2bbLqs",
+    authDomain: "mrh-detaentry.firebaseapp.com",
+    databaseURL: "https://mrh-detaentry-default-rtdb.firebaseio.com",
+    projectId: "mrh-detaentry",
+    storageBucket: "mrh-detaentry.firebasestorage.app",
+    messagingSenderId: "1046673955321",
+    appId: "1:1046673955321:web:6e963d1548b685698e8528"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase(app);
+
+  const loginForm = document.getElementById("loginForm");
+  const loginDiv = document.getElementById("loginDiv");
+  const profileDiv = document.getElementById("profile");
+
+  loginForm.addEventListener("submit", (e) => {
+    e.preventDefault();
+
+    const loginName = document.getElementById("loginName").value.trim();
+    const loginDob = document.getElementById("loginDob").value;
+
+    const dbRef = ref(db);
+
+    get(child(dbRef, "registrations")).then((snapshot) => {
+      if (snapshot.exists()) {
+        let found = false;
+        snapshot.forEach((childSnapshot) => {
+          const data = childSnapshot.val();
+          if (data.name === loginName && data.dob === loginDob) {
+            // Login Success
+            document.getElementById("pName").innerText = data.name;
+            document.getElementById("pFather").innerText = data.father;
+            document.getElementById("pMother").innerText = data.mother;
+            document.getElementById("pDob").innerText = data.dob;
+            document.getElementById("pReligion").innerText = data.religion;
+
+            loginDiv.style.display = "none";
+            profileDiv.style.display = "block";
+            found = true;
+            return true; // break foreach
+          }
+        });
+        if (!found) {
+          alert("Invalid Name or Date of Birth!");
+        }
+      } else {
+        alert("No registrations found in database!");
+      }
+    }).catch((error) => {
+      alert("Error: " + error.message);
+    });
+  });
+
+  window.logout = function() {
+    profileDiv.style.display = "none";
+    loginDiv.style.display = "block";
+    loginForm.reset();
+  }
+</script>
+
+</body>
+</html>
