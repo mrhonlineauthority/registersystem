@@ -3,126 +3,197 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Registration Form</title>
-
-<!-- Firebase SDK -->
-<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database.js"></script>
-
+<title>M.R.H Student Portal Registration</title>
 <style>
 body {
+  font-family: Arial, sans-serif;
+  background: #f9f9f9;
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
-  margin: 0;
+  min-height: 100vh;
 }
-form {
-  text-align: left;
+.container {
+  background: white;
+  padding: 20px 30px;
+  border-radius: 10px;
+  width: 100%;
+  max-width: 500px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
 }
-#notification {
-  position: fixed;
-  top: 10%;
-  left: 50%;
-  transform: translateX(-50%);
-  background: #e0ffe0;
-  border: 1px solid #00aa00;
-  padding: 20px;
+.heading {
+  text-align: center;
+  color: red;
+  margin-bottom: 20px;
+}
+form input, form select, form button {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 12px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  box-sizing: border-box;
+}
+form button {
+  background: red;
+  color: white;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+}
+.password-field {
+  position: relative;
+}
+.password-field .togglePassword {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+}
+.success-message {
   display: none;
-}
-#notification button {
-  float: right;
+  margin-top: 20px;
+  text-align: center;
+  background: #d4edda;
+  color: #155724;
+  padding: 15px;
+  border-radius: 5px;
 }
 </style>
 </head>
 <body>
+<div class="container">
+  <h1 class="heading">M.R.H Student Portal Registration</h1>
+  <form id="registerForm">
+    <input type="text" name="fullName" placeholder="Full Name" required>
+    <input type="date" name="dob" placeholder="Date of Birth" required>
+    <select name="gender" required>
+      <option value="">Gender</option>
+      <option value="Male">Male</option>
+      <option value="Female">Female</option>
+    </select>
+    <select name="religion" required>
+      <option value="">Religion</option>
+      <option value="Islam">Islam</option>
+      <option value="Hindu">Hindu</option>
+      <option value="Buddhist">Buddhist</option>
+      <option value="Christian">Christian</option>
+    </select>
+    <input type="text" name="nationality" placeholder="Nationality" required>
+    <input type="text" name="division" placeholder="Division" required>
+    <input type="text" name="district" placeholder="District" required>
+    <input type="text" name="upazila" placeholder="Upazila" required>
+    <input type="text" name="postcode" placeholder="Post Code" required>
+    <input type="text" name="school" placeholder="School Name" required>
+    <input type="text" name="className" placeholder="Class" required>
+    <select name="groupName" required>
+      <option value="">Group</option>
+      <option value="Science">Science</option>
+      <option value="Business Studies">Business Studies</option>
+      <option value="Humanities">Humanities</option>
+    </select>
+    <input type="text" name="roll" placeholder="Roll Number" required>
+    <input type="text" name="idNumber" placeholder="ID Number" required>
+    <input type="email" name="email" placeholder="Email" required>
+    <input type="text" name="mobile" placeholder="Mobile Number" required>
+    <input type="text" name="username" placeholder="Username (lowercase, no spaces)" pattern="[a-z0-9]+" title="Lowercase letters and numbers only" required>
+    <div class="password-field">
+      <input type="password" name="password" placeholder="Password" required>
+      <span class="togglePassword">👁️</span>
+    </div>
+    <div class="password-field">
+      <input type="password" name="confirmPassword" placeholder="Confirm Password" required>
+      <span class="togglePassword">👁️</span>
+    </div>
+    <button type="submit">Submit</button>
+  </form>
 
-<div id="notification">
-  <span>Your Form Submitted Success!</span>
-  <button onclick="closeNotification()">OK</button>
+  <div id="successMessage" class="success-message">
+    <p>Your registration is complete! Please login.</p>
+    <button id="okBtn">OK</button>
+  </div>
 </div>
 
-<form id="regForm">
-  <h2 style="text-align:center;">Registration Form</h2>
-  <label>Name:</label><br>
-  <input type="text" id="name" required><br><br>
-
-  <label>Father's Name:</label><br>
-  <input type="text" id="father" required><br><br>
-
-  <label>Mother's Name:</label><br>
-  <input type="text" id="mother" required><br><br>
-
-  <label>Date of Birth:</label><br>
-  <input type="date" id="dob" required><br><br>
-
-  <label>Religion:</label><br>
-  <select id="religion" required>
-    <option value="">Select</option>
-    <option value="Islam">Islam</option>
-    <option value="Others">Others</option>
-  </select><br><br>
-
-  <button type="submit">Registration</button>
-</form>
-
 <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
-  import { getDatabase, ref, push, set } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-database.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-app.js";
+import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-auth.js";
+import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-database.js";
 
-  // 🔥 তোমার Firebase Config (সঠিকভাবে যুক্ত করা হয়েছে)
-  const firebaseConfig = {
-    apiKey: "AIzaSyC7UIa6duPhQ0_ZXxwWZBS60P_EP2bbLqs",
-    authDomain: "mrh-detaentry.firebaseapp.com",
-    databaseURL: "https://mrh-detaentry-default-rtdb.firebaseio.com",
-    projectId: "mrh-detaentry",
-    storageBucket: "mrh-detaentry.firebasestorage.app",
-    messagingSenderId: "1046673955321",
-    appId: "1:1046673955321:web:6e963d1548b685698e8528"
-  };
+// Firebase config
+const firebaseConfig = {
+  apiKey: "AIzaSyDML_5f7ACdq0AUDN7Kc2VZmz_2p05jBNU",
+  authDomain: "mrh-studeninfo.firebaseapp.com",
+  databaseURL: "https://mrh-studeninfo-default-rtdb.firebaseio.com/",
+  projectId: "mrh-studeninfo",
+  storageBucket: "mrh-studeninfo.firebasestorage.app",
+  messagingSenderId: "698135384881",
+  appId: "1:698135384881:web:a30b0bafe87e6da947d610"
+};
 
-  const app = initializeApp(firebaseConfig);
-  const db = getDatabase(app);
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getDatabase(app);
 
-  const form = document.getElementById("regForm");
-  const notification = document.getElementById("notification");
-
-  form.addEventListener("submit", (e) => {
-    e.preventDefault();
-
-    const name = document.getElementById("name").value.trim();
-    const father = document.getElementById("father").value.trim();
-    const mother = document.getElementById("mother").value.trim();
-    const dob = document.getElementById("dob").value;
-    const religion = document.getElementById("religion").value;
-
-    if (!name || !father || !mother || !dob || !religion) {
-      alert("Please fill out all fields!");
-      return;
-    }
-
-    const newRef = push(ref(db, "registrations"));
-    set(newRef, {
-      name,
-      father,
-      mother,
-      dob,
-      religion,
-      submittedAt: new Date().toLocaleString()
-    })
-    .then(() => {
-      form.reset();
-      notification.style.display = "block";
-    })
-    .catch((error) => {
-      alert("Error: " + error.message);
-    });
+// Toggle password visibility
+document.querySelectorAll(".togglePassword").forEach(toggle => {
+  toggle.addEventListener("click", function() {
+    const input = this.previousElementSibling;
+    input.type = input.type === "password" ? "text" : "password";
   });
+});
 
-  window.closeNotification = function() {
-    notification.style.display = "none";
-  };
+// Form submit
+const registerForm = document.getElementById("registerForm");
+const successMessage = document.getElementById("successMessage");
+const okBtn = document.getElementById("okBtn");
+
+registerForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const password = registerForm.password.value;
+  const confirmPassword = registerForm.confirmPassword.value;
+
+  if(password !== confirmPassword) {
+    alert("Passwords do not match!");
+    return;
+  }
+
+  const email = registerForm.email.value;
+
+  try {
+    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+    const uid = userCredential.user.uid;
+
+    await set(ref(db, 'students/' + uid), {
+      fullName: registerForm.fullName.value,
+      dob: registerForm.dob.value,
+      gender: registerForm.gender.value,
+      religion: registerForm.religion.value,
+      nationality: registerForm.nationality.value,
+      division: registerForm.division.value,
+      district: registerForm.district.value,
+      upazila: registerForm.upazila.value,
+      postcode: registerForm.postcode.value,
+      school: registerForm.school.value,
+      className: registerForm.className.value,
+      groupName: registerForm.groupName.value,
+      roll: registerForm.roll.value,
+      idNumber: registerForm.idNumber.value,
+      mobile: registerForm.mobile.value,
+      username: registerForm.username.value
+    });
+
+    registerForm.reset();
+    successMessage.style.display = "block";
+  } catch (error) {
+    alert("Error: " + error.message);
+  }
+});
+
+okBtn.addEventListener("click", () => {
+  window.location.href = "https://mrhonlineauthority.github.io/mrhregistration/mrhaccount";
+});
 </script>
-
 </body>
 </html>
