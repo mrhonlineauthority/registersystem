@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>M.R.H Login & Signup System</title>
+
+    <!-- Google Font -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Poppins", sans-serif;
+      }
+
+      body {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #f0faff;
+      }
+
+      .wrapper {
+        position: relative;
+        max-width: 470px;
+        width: 100%;
+        border-radius: 12px;
+        padding: 20px 30px 120px;
+        background: #4070f4;
+        box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+      }
+
+      .form.login {
+        position: absolute;
+        left: 50%;
+        bottom: -86%;
+        transform: translateX(-50%);
+        width: calc(100% + 220px);
+        padding: 20px 140px;
+        border-radius: 50%;
+        height: 100%;
+        background: #fff;
+        transition: all 0.6s ease;
+      }
+
+      .wrapper.active .form.login {
+        bottom: -15%;
+        border-radius: 35%;
+        box-shadow: 0 -5px 10px rgba(0, 0, 0, 0.1);
+      }
+
+      .form header {
+        font-size: 30px;
+        text-align: center;
+        color: #fff;
+        font-weight: 600;
+        cursor: pointer;
+      }
+
+      .form.login header {
+        color: #333;
+        opacity: 0.6;
+      }
+
+      .wrapper.active .form.login header {
+        opacity: 1;
+      }
+
+      .wrapper.active .signup header {
+        opacity: 0.6;
+      }
+
+      .wrapper form {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        margin-top: 40px;
+      }
+
+      form input {
+        height: 60px;
+        outline: none;
+        border: none;
+        padding: 0 15px;
+        font-size: 16px;
+        font-weight: 400;
+        color: #333;
+        border-radius: 8px;
+        background: #fff;
+      }
+
+      .form.login input {
+        border: 1px solid #aaa;
+      }
+
+      .form.login input:focus {
+        box-shadow: 0 1px 0 #ddd;
+      }
+
+      form .checkbox {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .checkbox input[type="checkbox"] {
+        height: 16px;
+        width: 16px;
+        accent-color: #fff;
+        cursor: pointer;
+      }
+
+      form .checkbox label {
+        cursor: pointer;
+        color: #fff;
+      }
+
+      form a {
+        color: #333;
+        text-decoration: none;
+      }
+
+      form a:hover {
+        text-decoration: underline;
+      }
+
+      form input[type="submit"] {
+        margin-top: 15px;
+        font-size: 18px;
+        font-weight: 500;
+        cursor: pointer;
+        border: none;
+      }
+
+      .form.login input[type="submit"] {
+        background: #4070f4;
+        color: #fff;
+      }
+
+      .message {
+        text-align: center;
+        font-weight: 500;
+        margin-top: 15px;
+        color: green;
+      }
+    </style>
+  </head>
+  <body>
+    <section class="wrapper">
+      <div class="form signup">
+        <header>Signup</header>
+        <form id="signupForm">
+          <input type="text" id="signupName" placeholder="Full name" required />
+          <input
+            type="email"
+            id="signupEmail"
+            placeholder="Email address"
+            required
+          />
+          <input
+            type="password"
+            id="signupPassword"
+            placeholder="Password"
+            required
+          />
+          <div class="checkbox">
+            <input type="checkbox" id="signupCheck" required />
+            <label for="signupCheck">I accept all terms & conditions</label>
+          </div>
+          <input type="submit" value="Signup" />
+          <div class="message" id="signupMsg"></div>
+        </form>
+      </div>
+
+      <div class="form login">
+        <header>Login</header>
+        <form id="loginForm">
+          <input
+            type="email"
+            id="loginEmail"
+            placeholder="Email address"
+            required
+          />
+          <input
+            type="password"
+            id="loginPassword"
+            placeholder="Password"
+            required
+          />
+          <a href="#">Forgot password?</a>
+          <input type="submit" value="Login" />
+          <div class="message" id="loginMsg"></div>
+        </form>
+      </div>
+    </section>
+
+    <!-- Firebase Configuration -->
+    <script type="module">
+      // Import Firebase SDK
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-app.js";
+      import {
+        getAuth,
+        createUserWithEmailAndPassword,
+        signInWithEmailAndPassword,
+      } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-auth.js";
+      import {
+        getDatabase,
+        ref,
+        set,
+      } from "https://www.gstatic.com/firebasejs/12.5.0/firebase-database.js";
+
+      // তোমার Firebase Config (তুমি যেটা পাঠিয়েছো)
+      const firebaseConfig = {
+        apiKey: "AIzaSyCwBaJPXtPNZmhAbskDHz1AUgwtultPm1o",
+        authDomain: "mrhsignuplogin.firebaseapp.com",
+        projectId: "mrhsignuplogin",
+        storageBucket: "mrhsignuplogin.firebasestorage.app",
+        messagingSenderId: "960608227611",
+        appId: "1:960608227611:web:5334ee3963e142defa83be",
+        databaseURL: "https://mrhsignuplogin-default-rtdb.firebaseio.com/",
+      };
+
+      // Initialize Firebase
+      const app = initializeApp(firebaseConfig);
+      const auth = getAuth(app);
+      const db = getDatabase(app);
+
+      // UI Toggle
+      const wrapper = document.querySelector(".wrapper"),
+        signupHeader = document.querySelector(".signup header"),
+        loginHeader = document.querySelector(".login header");
+
+      loginHeader.addEventListener("click", () => {
+        wrapper.classList.add("active");
+      });
+      signupHeader.addEventListener("click", () => {
+        wrapper.classList.remove("active");
+      });
+
+      // Signup Function
+      const signupForm = document.getElementById("signupForm");
+      signupForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const name = document.getElementById("signupName").value;
+        const email = document.getElementById("signupEmail").value;
+        const password = document.getElementById("signupPassword").value;
+        const msg = document.getElementById("signupMsg");
+
+        try {
+          const userCredential = await createUserWithEmailAndPassword(
+            auth,
+            email,
+            password
+          );
+          const user = userCredential.user;
+
+          // Save data to Realtime Database
+          await set(ref(db, "users/" + user.uid), {
+            name: name,
+            email: email,
+            uid: user.uid,
+            createdAt: new Date().toISOString(),
+          });
+
+          msg.style.color = "green";
+          msg.textContent = "✅ Signup Successful!";
+          signupForm.reset();
+        } catch (error) {
+          msg.style.color = "red";
+          msg.textContent = error.message;
+        }
+      });
+
+      // Login Function
+      const loginForm = document.getElementById("loginForm");
+      loginForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const email = document.getElementById("loginEmail").value;
+        const password = document.getElementById("loginPassword").value;
+        const msg = document.getElementById("loginMsg");
+
+        try {
+          await signInWithEmailAndPassword(auth, email, password);
+          msg.style.color = "green";
+          msg.textContent = "✅ Login Successful!";
+          loginForm.reset();
+        } catch (error) {
+          msg.style.color = "red";
+          msg.textContent = error.message;
+        }
+      });
+    </script>
+  </body>
+</html>
