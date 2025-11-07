@@ -1,56 +1,161 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="bn">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>M.R.H Register System</title>
+<title>M.R.H Online Registration Authority</title>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
 <style>
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Poppins", sans-serif;
+  }
   body {
+    background: #f7f7f7;
     display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+  }
+  header {
+    width: 100%;
+    text-align: center;
+    background: #ff4da6;
+    color: white;
+    padding: 15px 5px;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+  }
+  header h1 {
+    font-size: 1.3rem;
+    margin-bottom: 4px;
+  }
+  header h2 {
+    font-size: 1.1rem;
+    font-weight: 400;
+  }
+
+  .btn-container {
+    margin-top: 25px;
+    width: 90%;
+    max-width: 400px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    background: #ff4da6;
+    color: white;
+    font-size: 1rem;
+    font-weight: 500;
+    text-decoration: none;
+    padding: 14px 0;
+    border-radius: 12px;
+    transition: 0.3s;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.15);
+  }
+  .btn:hover {
+    background: #ff1f85;
+    transform: scale(1.03);
+  }
+
+  /* Back Button Style */
+  .back-btn {
+    position: fixed;
+    top: 12px;
+    left: 12px;
+    background: #ff4da6;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 45px;
+    height: 45px;
+    display: none;
     justify-content: center;
     align-items: center;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.2);
+    z-index: 10;
+  }
+  .iframe-container {
+    display: none;
+    width: 100%;
     height: 100vh;
-    margin: 0;
-    font-family: Arial, sans-serif;
+    border: none;
   }
-  .container {
-    text-align: center;
-  }
-  .container button {
-    display: block;
-    width: 200px;
-    padding: 10px;
-    margin: 10px auto;
-    cursor: pointer;
+
+  @media (min-width: 600px) {
+    header h1 { font-size: 1.6rem; }
+    header h2 { font-size: 1.2rem; }
+    .btn { font-size: 1.1rem; }
   }
 </style>
 </head>
 <body>
 
-<div class="container">
-  <h1>M.R.H Register System</h1>
+<header>
+  <h1>M.R.H Online Registration Authority</h1>
+  <h2>Home Page</h2>
+</header>
 
-  <button id="registerBtn">Register Now</button>
-  <button id="loginBtn">Login Now</button>
-  <button id="officeBtn">Office</button>
+<!-- Back button -->
+<button class="back-btn" id="backBtn"><i class="fa-solid fa-arrow-left"></i></button>
+
+<!-- Button section -->
+<div class="btn-container" id="homeButtons">
+  <a href="#" class="btn" data-link="https://mrhonlineauthority.github.io/registersystem/loginsignup">
+    <i class="fa-solid fa-user-lock"></i> Signup / Login
+  </a>
+  <a href="#" class="btn" data-link="https://mrhonlineauthority.github.io/registersystem/registration">
+    <i class="fa-solid fa-id-card"></i> Student Registration
+  </a>
+  <a href="#" class="btn" data-link="https://mrhonlineauthority.github.io/orderconfirm-">
+    <i class="fa-solid fa-cart-shopping"></i> Order Form
+  </a>
+  <a href="#" class="btn" data-link="https://mrhonlineauthority.github.io/mrhidcardapply">
+    <i class="fa-solid fa-address-card"></i> ID Apply
+  </a>
+  <a href="#" class="btn" data-link="https://mrhonlineauthority.github.io/mrhresultchack">
+    <i class="fa-solid fa-file-circle-check"></i> Check Result
+  </a>
+  <a href="#" class="btn" data-link="https://mrhonlineauthority.github.io/mrhresultchack">
+    <i class="fa-solid fa-folder-open"></i> E-FF
+  </a>
+  <a href="#" class="btn" data-link="https://mrhonlineauthority.github.io/mrhhelplinehome">
+    <i class="fa-solid fa-headset"></i> Help Line
+  </a>
 </div>
 
+<!-- Iframe for loading pages -->
+<iframe id="webFrame" class="iframe-container"></iframe>
+
 <script>
-  // পরে লিঙ্ক যোগ করতে পারবে
-  document.getElementById("registerBtn").onclick = function() {
-    // window.location.href = "https://mrhonlineauthority.github.io/registersystem/registration";
-    alert("Register Now button clicked");
-  }
+const buttons = document.querySelectorAll(".btn");
+const frame = document.getElementById("webFrame");
+const homeButtons = document.getElementById("homeButtons");
+const backBtn = document.getElementById("backBtn");
 
-  document.getElementById("loginBtn").onclick = function() {
-    // window.location.href = "https://mrhonlineauthority.github.io/registersystem/login";
-    alert("Login Now button clicked");
-  }
+buttons.forEach(btn => {
+  btn.addEventListener("click", e => {
+    e.preventDefault();
+    const url = btn.getAttribute("data-link");
+    frame.src = url;
+    frame.style.display = "block";
+    homeButtons.style.display = "none";
+    backBtn.style.display = "flex";
+  });
+});
 
-  document.getElementById("officeBtn").onclick = function() {
-    // window.location.href = "https://mrhonlineauthority.github.io/registersystem/admin";
-    alert("Office button clicked");
-  }
+backBtn.addEventListener("click", () => {
+  frame.src = "";
+  frame.style.display = "none";
+  homeButtons.style.display = "flex";
+  backBtn.style.display = "none";
+});
 </script>
 
 </body>
